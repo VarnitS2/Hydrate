@@ -55,7 +55,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         mMap = googleMap;
 
 //         Marker at Illini Union.
-//        setMarker();
+        LatLng illiniUnion = new LatLng(40.1093, -88.2272);
+        setMarker(illiniUnion);
 
         // Add a marker in Sydney and move the camera
         LatLng union = new LatLng(40.1092, -88.2272);
@@ -88,10 +89,12 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         // Here, thisActivity is the current activity
     }
 
-    public void setMarker() {
-        LatLng champaign = new LatLng(40.1093, -88.2272);
-        mMap.addMarker(new MarkerOptions().position(champaign).title("Marker in Champaign"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(champaign));
+    /**
+     * Sets a marker at the specified location.
+     */
+    public void setMarker(LatLng location) {
+        mMap.addMarker(new MarkerOptions().position(location).title("Marker in Champaign"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
     @Override
@@ -126,6 +129,4 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         // (the camera animates to the user's current position).
         return false;
     }
-
-}
 }
