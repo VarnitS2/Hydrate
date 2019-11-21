@@ -41,6 +41,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Marker at Illini Union.
         // Test comment
+        setMarker();
+    }
+
+    public void setMarker() {
         LatLng champaign = new LatLng(40.1093, -88.2272);
         mMap.addMarker(new MarkerOptions().position(champaign).title("Marker in Champaign"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(champaign));
