@@ -35,11 +35,15 @@ import java.util.Map;
 @SuppressWarnings("SpellCheckingInspection")
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, OnMapReadyCallback {
 
+    /** The GoogleMap to work with. */
     private GoogleMap map;
+
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
 
+    /** The Map of all building LatLng objects. */
     private Map<String, LatLng> BUILDING_LATLNGS = BuildingLatLng.getNameMap();
 
+    /** The List of all building names. */
     private ArrayList<String> BUILDING_NAMES = new ArrayList<>();
 
     @Override
@@ -106,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     }
 
     /**
-     * Sets a marker at the specified location.
+     * Sets a marker at the specified location with the specified name.
      */
     public void setMarker(String name, LatLng location) {
         map.addMarker(new MarkerOptions().position(location).title("Marker on " + name));

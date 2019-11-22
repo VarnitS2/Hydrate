@@ -1,7 +1,5 @@
 package com.example.hydrate;
 
-import android.annotation.SuppressLint;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
