@@ -49,6 +49,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
         // Add a marker in Sydney and move the camera
         LatLng union = new LatLng(40.1092, -88.2272);
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
@@ -73,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         //mMap.addMarker()
-        //mMap.addMarker(new MarkerOptions().position(origin).title("Marker at user location"));
+        mMap.addMarker(new MarkerOptions().position(union).title("Union"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(union));
         // Here, thisActivity is the current activity
 
