@@ -3,12 +3,20 @@ package com.example.hydrate;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.health.SystemHealthManager;
+import android.widget.Toast;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,10 +26,25 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings("SpellCheckingInspection")
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    /** The GoogleMap to work with. */
+    private GoogleMap map;
+
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
+
+    /** The Map of all building LatLng objects. */
+    private Map<String, LatLng> BUILDING_LATLNGS = BuildingLatLng.getNameMap();
+
+    /** The List of all building names. */
+    private ArrayList<String> BUILDING_NAMES = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +54,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-    }
 
+        for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
+            BUILDING_NAMES.add(entry.getKey());
+        }
+    }
 
     /**
      * Manipulates the map once available.
@@ -45,14 +71,19 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        map = googleMap;
+
+        // Initial Markers.
+        for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
+            setMarker(entry.getKey(), entry.getValue());
+        }
 
         // Add a marker in Sydney and move the camera
         LatLng union = new LatLng(40.1092, -88.2272);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
+            map.setMyLocationEnabled(true);
         } else {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -71,14 +102,22 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             }
 
         }
-        mMap.setOnMyLocationButtonClickListener(this);
-        mMap.setOnMyLocationClickListener(this);
-        //mMap.addMarker()
-        mMap.addMarker(new MarkerOptions().position(union).title("Union"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(union));
+        map.setOnMyLocationButtonClickListener(this);
+        map.setOnMyLocationClickListener(this);
+        //map.addMarker()
+        //map.addMarker(new MarkerOptions().position(origin).title("Marker at user location"));
+        map.moveCamera(CameraUpdateFactory.newLatLng(union));
         // Here, thisActivity is the current activity
-
     }
+
+    /**
+     * Sets a marker at the specified location with the specified name.
+     */
+    public void setMarker(String name, LatLng location) {
+        map.addMarker(new MarkerOptions().position(location).title("Marker on " + name));
+        map.moveCamera(CameraUpdateFactory.newLatLng(location));
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
@@ -111,5 +150,4 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         // (the camera animates to the user's current position).
         return false;
     }
-
 }
