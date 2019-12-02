@@ -43,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
 
+    /** Google Play Location services client. */
     private FusedLocationProviderClient fusedLocationClient;
 
     /** The Map of all building LatLng objects. */
@@ -60,15 +61,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Initializing google play location services client.
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        // Getting last known user location to center the map on.
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            // Logic to handle location object
+                            // Centering map on the user.
                             final float defaultMapZoom = 17f;
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(location.getLatitude(), location.getLongitude()), defaultMapZoom));
@@ -76,6 +79,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                     }
                 });
 
+        // Adding building names to an ArrayList.
         for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
             BUILDING_NAMES.add(entry.getKey());
         }
@@ -99,8 +103,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             setMarker(entry.getKey(), entry.getValue());
         }
 
-        // Add a marker in Sydney and move the camera
-        LatLng union = new LatLng(40.1092, -88.2272);
+        // Getting permissions?
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
@@ -120,13 +123,13 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }
-
         }
+
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
         //map.addMarker()
         //map.addMarker(new MarkerOptions().position(origin).title("Marker at user location"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(union));
+//        map.moveCamera(CameraUpdateFactory.newLatLng(union));
         // Here, thisActivity is the current activity
     }
 
@@ -161,7 +164,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     }
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Current location", Toast.LENGTH_LONG).show();
     }
     @Override
     public boolean onMyLocationButtonClick() {
