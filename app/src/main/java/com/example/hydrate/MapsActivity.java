@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.Manifest;
@@ -16,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.health.SystemHealthManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.Toast;
 
@@ -71,6 +74,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        ImageButton settings = findViewById(R.id.settings);
+        Button hydrate = findViewById(R.id.hydrate);
         map = googleMap;
 
         // Initial Markers.
@@ -107,7 +112,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         //map.addMarker()
         //map.addMarker(new MarkerOptions().position(origin).title("Marker at user location"));
         map.moveCamera(CameraUpdateFactory.newLatLng(union));
-        // Here, thisActivity is the current activity
+        Intent intent = new Intent(this, SettingsActivity.class);
+        settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
     }
 
     /**
