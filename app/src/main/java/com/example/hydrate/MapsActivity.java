@@ -19,12 +19,15 @@ import android.os.health.SystemHealthManager;
 import android.widget.Toast;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -40,6 +43,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
 
+    private FusedLocationProviderClient fusedLocationClient;
+
     /** The Map of all building LatLng objects. */
     private Map<String, LatLng> BUILDING_LATLNGS = BuildingLatLng.getNameMap();
 
@@ -54,6 +59,22 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            final float defaultMapZoom = 17f;
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(location.getLatitude(), location.getLongitude()), defaultMapZoom));
+                        }
+                    }
+                });
 
         for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
             BUILDING_NAMES.add(entry.getKey());
@@ -140,11 +161,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     }
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location.toString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
     }
     @Override
     public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Current Location", Toast.LENGTH_SHORT).show();
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
         return false;
