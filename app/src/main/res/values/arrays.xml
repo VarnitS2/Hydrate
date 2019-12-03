@@ -9,4 +9,13 @@
         <item>reply</item>
         <item>reply_all</item>
     </string-array>
+    <string-array name="priority_measurement_entries">
+        <item>Distance</item>
+        <item>Quality</item>
+    </string-array>
+
+    <string-array name="priority_measurement_values">
+        <item>distance</item>
+        <item>quality</item>
+    </string-array>
 </resources>
