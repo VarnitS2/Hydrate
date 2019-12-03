@@ -103,34 +103,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
             setMarker(entry.getKey(), entry.getValue());
         }
 
-        // Getting permissions?
+        // Getting location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
         } else {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
 
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
-        //map.addMarker()
-        //map.addMarker(new MarkerOptions().position(origin).title("Marker at user location"));
-//        map.moveCamera(CameraUpdateFactory.newLatLng(union));
-        // Here, thisActivity is the current activity
     }
 
     /**
@@ -149,17 +133,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                    // Permission granted.
+                    return;
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // Permission denied; try again.
+                    Toast.makeText(this, "Please let us have your location", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
     }
     @Override
