@@ -41,6 +41,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     /** The GoogleMap to work with. */
     private GoogleMap map;
 
+    /** The Request Constant (can be any number). */
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
 
     /** The Map of all building LatLng objects. */
@@ -77,15 +78,12 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         ImageButton settings = findViewById(R.id.settings);
         Button hydrate = findViewById(R.id.hydrate);
         map = googleMap;
-
         // Initial Markers.
         for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
             setMarker(entry.getKey(), entry.getValue());
         }
-
-        // Add a marker in Sydney and move the camera
         LatLng union = new LatLng(40.1092, -88.2272);
-
+        // ask if permission is already granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
@@ -101,10 +99,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         }
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
-        //map.addMarker()
-        //map.addMarker(new MarkerOptions().position(origin).title("Marker at user location"));
+        // moves camera to the union
         map.moveCamera(CameraUpdateFactory.newLatLng(union));
-        Intent intent = new Intent(this, SettingsActivity.class);
         settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
     }
 
@@ -116,6 +112,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         map.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
+    /**
+     * Asks the user for access to their location
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
