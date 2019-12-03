@@ -23,11 +23,11 @@
 
         <Button
             android:id="@+id/hydrate"
-            android:layout_width="98dp"
-            android:layout_height="74dp"
-            android:layout_marginStart="296dp"
-            android:layout_marginLeft="296dp"
-            android:layout_marginTop="588dp"
+            android:layout_width="90dp"
+            android:layout_height="54dp"
+            android:layout_marginStart="308dp"
+            android:layout_marginLeft="308dp"
+            android:layout_marginTop="592dp"
             android:text="Hydrate"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
