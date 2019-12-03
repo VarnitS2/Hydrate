@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.Manifest;
@@ -16,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.health.SystemHealthManager;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.Toast;
 
@@ -41,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
     /** The GoogleMap to work with. */
     private GoogleMap map;
 
+    /** The Request Constant (can be any number). */
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
 
     /** Google Play Location services client. */
@@ -96,6 +100,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        ImageButton settings = findViewById(R.id.settings);
+        Button hydrate = findViewById(R.id.hydrate);
         map = googleMap;
 
         // Initial Markers.
@@ -115,6 +121,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
+
+        // Handler for the settings button.
+        settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
     }
 
     /**
@@ -125,6 +134,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         map.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
+    /**
+     * Asks the user for access to their location
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
