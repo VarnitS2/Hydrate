@@ -28,9 +28,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.maps.android.SphericalUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -130,7 +132,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
      * Sets a marker at the specified location with the specified name.
      */
     public void setMarker(String name, LatLng location) {
-        map.addMarker(new MarkerOptions().position(location).title("Marker on " + name));
+        map.addMarker(new MarkerOptions().position(location).title("Marker on " + name).icon(BitmapDescriptorFactory.fromResource(R.drawable.drinking_fountain_logo)));
         map.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
