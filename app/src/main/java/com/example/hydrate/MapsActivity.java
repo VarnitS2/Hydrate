@@ -131,20 +131,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
     }
 
-//    public double rad(double x) {
-//        return x * Math.PI / 180;
-//    }
-//
-//    public double computeDistance(LatLng p1, LatLng p2) {
-//        final int R = 6378137;
-//        double dLat = rad(p2.latitude - p1.latitude);
-//        double dLong = rad(p2.longitude - p1.longitude);
-//        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-//                Math.cos(rad(p1.latitude)) * Math.cos(rad(p2.latitude)) *
-//                        Math.sin(dLong / 2) * Math.sin(dLong / 2);
-//        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//    }
-
     /**
      * Callback for Hydrate button.
      */
