@@ -32,6 +32,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import com.google.maps.android.SphericalUtil;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,6 +126,54 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMyLoca
 
         // Handler for the settings button.
         settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
+
+        // Handler for the hydrate button.
+        hydrate.setOnClickListener(unused -> hydrateClickHandler());
+    }
+
+//    public double rad(double x) {
+//        return x * Math.PI / 180;
+//    }
+//
+//    public double computeDistance(LatLng p1, LatLng p2) {
+//        final int R = 6378137;
+//        double dLat = rad(p2.latitude - p1.latitude);
+//        double dLong = rad(p2.longitude - p1.longitude);
+//        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//                Math.cos(rad(p1.latitude)) * Math.cos(rad(p2.latitude)) *
+//                        Math.sin(dLong / 2) * Math.sin(dLong / 2);
+//        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//    }
+
+    /**
+     * Callback for Hydrate button.
+     */
+    public void hydrateClickHandler() {
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            double minDistance = 10000;
+                            String minKey = "";
+                            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+                            for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
+                                double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue());
+                                if (distance < minDistance) {
+                                    minDistance = distance;
+                                    minKey = entry.getKey();
+                                }
+                            }
+
+                            // Centering map on the closest water fountain.
+                            final float defaultMapZoom = 18f;
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    BUILDING_LATLNGS.get(minKey), defaultMapZoom));
+                        }
+                    }
+                });
     }
 
     /**
