@@ -39,7 +39,7 @@ class BuildingLatLng {
 
     public static final LatLng EVERITT = new LatLng(40.1109, -88.2283);
 
-    public static final LatLng FOELLINGER = new LatLng(40.106125, -88.227307);
+    public static final LatLng FOELLINGER = new LatLng(40.105932, -88.227188);
 
     public static final LatLng GRAINGER = new LatLng(40.1125, -88.2269);
 
@@ -77,7 +77,7 @@ class BuildingLatLng {
 
     public static final LatLng UNION = new LatLng(40.1092, -88.2272);
 
-    public static final LatLng UGL = new LatLng(40.104902, -88.227114);
+    public static final LatLng UGL = new LatLng(40.104691, -88.227180);
 
     public static Map<String, LatLng> getNameMap() {
         return new HashMap<String, LatLng>() {
