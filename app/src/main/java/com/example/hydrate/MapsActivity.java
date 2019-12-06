@@ -78,9 +78,6 @@ public class MapsActivity extends FragmentActivity implements
     /** Map of all Markers with their Building Names. */
     private Map<String, Marker> BUILDING_MARKERS;
 
-    /** Key of the closest building to the user. */
-    private String minKey;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -204,7 +201,7 @@ public class MapsActivity extends FragmentActivity implements
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             double minDistance = 10000;
-                            minKey = "";
+                            String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
                             for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
