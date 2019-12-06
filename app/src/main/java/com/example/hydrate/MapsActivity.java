@@ -18,8 +18,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.health.SystemHealthManager;
+import android.view.LayoutInflater;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toast;
 
@@ -157,8 +161,9 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public boolean onMarkerClick(final Marker marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        builder.setView(inflater.inflate(R.layout.alert_layout, null));
         builder.setTitle(marker.getTitle())
-                .setMessage("Rating goes here!")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
@@ -179,6 +184,9 @@ public class MapsActivity extends FragmentActivity implements
         final float defaultMapZoom = 18f;
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 marker.getPosition(), defaultMapZoom));
+
+        TextView buildingName = dialog.findViewById(R.id.buildingName);
+        buildingName.setText(marker.getTitle());
 
         return true;
     }
@@ -221,7 +229,7 @@ public class MapsActivity extends FragmentActivity implements
      * Sets a marker at the specified location with the specified name.
      */
     public void setMarker(String name, LatLng location) {
-        Marker marker = map.addMarker(new MarkerOptions().position(location).title(name).snippet("Yo").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+        Marker marker = map.addMarker(new MarkerOptions().position(location).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
         map.moveCamera(CameraUpdateFactory.newLatLng(location));
 
         BUILDING_MARKERS.put(name, marker);
