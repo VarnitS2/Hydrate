@@ -201,7 +201,7 @@ public class MapsActivity extends FragmentActivity implements
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            double minDistance = 10000;
+                            double minDistance = 999999999;
                             String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
