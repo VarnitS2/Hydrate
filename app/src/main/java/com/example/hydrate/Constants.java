@@ -35,7 +35,7 @@ class BuildingLatLng {
 
     public static final LatLng ENGINEERING_HALL = new LatLng(40.1108, -88.2270);
 
-    public static final LatLng ENGLISH = new LatLng(40.107576, -88.228173);
+    public static final LatLng ENGLISH_BUILDING = new LatLng(40.107576, -88.228173);
 
     public static final LatLng EVERITT = new LatLng(40.1109, -88.2283);
 
@@ -82,40 +82,40 @@ class BuildingLatLng {
     public static Map<String, LatLng> getNameMap() {
         return new HashMap<String, LatLng>() {
             {
-                put("ALTGELD", ALTGELD);
-                put("ARCHITECTURE", ARCHITECTURE);
-                put("ARMORY", ARMORY);
-                put("BECKMAN", BECKMAN);
-                put("BUSINESS", BUSINESS);
-                put("CERAMICS", CERAMICS);
-                put("CIVIL_ENG_LAB", CIVIL_ENG_LAB);
-                put("COORDINATED_SCIENCE_LAB", COORDINATED_SCIENCE_LAB);
-                put("DAVID_KINLEY", DAVID_KINLEY);
-                put("DCL", DCL);
-                put("ECEB", ECEB);
-                put("ENGINEERING_HALL", ENGINEERING_HALL);
-                put("ENGLISH", ENGLISH);
-                put("EVERITT", EVERITT);
-                put("FOELLINGER", FOELLINGER);
-                put("GRAINGER", GRAINGER);
-                put("HYDRO_SYSTEMS_LAB", HYDRO_SYSTEMS_LAB);
-                put("IKENBERRY", IKENBERRY);
-                put("KHAN_ANNEX", KHAN_ANNEX);
-                put("LINCOLN_HALL", LINCOLN_HALL);
-                put("LOOMIS", LOOMIS);
-                put("MAIN_LIBRARY", MAIN_LIBRARY);
-                put("MECHE", MECHE);
-                put("MEL", MEL);
-                put("MICRO_NANO_LAB", MICRO_NANO_LAB);
-                put("MSEB", MSEB);
-                put("NATURAL_HISTORY", NATURAL_HISTORY);
+                put("Altgeld", ALTGELD);
+                put("Architecture Building", ARCHITECTURE);
+                put("Armory", ARMORY);
+                put("Beckman Institute", BECKMAN);
+                put("Business Building", BUSINESS);
+                put("Ceramics Building", CERAMICS);
+                put("Civil Engineering Lab", CIVIL_ENG_LAB);
+                put("Coordinated Science Lab", COORDINATED_SCIENCE_LAB);
+                put("David Kinley", DAVID_KINLEY);
+                put("Digital Computer Lab", DCL);
+                put("ECE Building", ECEB);
+                put("Engineering Hall", ENGINEERING_HALL);
+                put("English Building", ENGLISH_BUILDING);
+                put("Everitt", EVERITT);
+                put("Foellinger", FOELLINGER);
+                put("Grainger Library", GRAINGER);
+                put("Hydro Systems Lab", HYDRO_SYSTEMS_LAB);
+                put("Ikenberry (SDRP)", IKENBERRY);
+                put("Khan Annex", KHAN_ANNEX);
+                put("Lincoln Hall", LINCOLN_HALL);
+                put("Loomis", LOOMIS);
+                put("Main Library", MAIN_LIBRARY);
+                put("Mechanical Engineering", MECHE);
+                put("Mechanical Engineering Lab", MEL);
+                put("Micro Nano Lab", MICRO_NANO_LAB);
+                put("Material Science and Engineering Building", MSEB);
+                put("Natural History Building", NATURAL_HISTORY);
                 put("NCSA", NCSA);
-                put("NOYES", NOYES);
-                put("SIEBEL", SIEBEL);
-                put("TALBOT", TALBOT);
-                put("TRANSPORTATION", TRANSPORTATION);
-                put("UNION", UNION);
-                put("UGL", UGL);
+                put("Noyes", NOYES);
+                put("Siebel Center for CS", SIEBEL);
+                put("Talbot", TALBOT);
+                put("Transportation Building", TRANSPORTATION);
+                put("Illini Union", UNION);
+                put("Undergraduate Library", UGL);
             }
         };
     }

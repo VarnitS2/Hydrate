@@ -150,13 +150,15 @@ public class MapsActivity extends FragmentActivity implements
         // Handler for the hydrate button.
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
 
+        // OnClick Listener for markers.
         map.setOnMarkerClickListener(this);
     }
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.app_name)
+        builder.setTitle(marker.getTitle())
+                .setMessage("Rating goes here!")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
