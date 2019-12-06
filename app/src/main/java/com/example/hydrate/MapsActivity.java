@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.health.SystemHealthManager;
 import android.view.LayoutInflater;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -80,9 +81,6 @@ public class MapsActivity extends FragmentActivity implements
     /** Key of the closest building to the user. */
     private String minKey;
 
-    /** TextView that holds building name for Alert Dialogs. */
-    private TextView textView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,7 +131,6 @@ public class MapsActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         ImageButton settings = findViewById(R.id.settings);
         Button hydrate = findViewById(R.id.hydrate);
-        textView = findViewById(R.id.textView);
         map = googleMap;
 
         // Initial Markers.
@@ -165,7 +162,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        textView.setText(test);
+        //FrameLayout mapsFrameLayoutBig = findViewById(R.id.mapsFrameLayoutBig);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
@@ -190,7 +187,9 @@ public class MapsActivity extends FragmentActivity implements
         final float defaultMapZoom = 18f;
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 marker.getPosition(), defaultMapZoom));
-
+        //LinearLayout linearLayout = mapsFrameLayoutBig.findViewById(R.id.linearLayout);
+        TextView buildingName = dialog.findViewById(R.id.buildingName);
+        buildingName.setText(marker.getTitle());
         return true;
     }
 
@@ -232,7 +231,7 @@ public class MapsActivity extends FragmentActivity implements
      * Sets a marker at the specified location with the specified name.
      */
     public void setMarker(String name, LatLng location) {
-        Marker marker = map.addMarker(new MarkerOptions().position(location).title(name).snippet("Yo").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+        Marker marker = map.addMarker(new MarkerOptions().position(location).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
         map.moveCamera(CameraUpdateFactory.newLatLng(location));
 
         BUILDING_MARKERS.put(name, marker);
