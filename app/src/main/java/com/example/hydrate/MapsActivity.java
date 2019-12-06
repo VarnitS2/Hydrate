@@ -156,16 +156,16 @@ public class MapsActivity extends FragmentActivity implements
         // Handler for the hydrate button.
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
 
+        // OnClick Listener for markers.
         map.setOnMarkerClickListener(this);
     }
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        //FrameLayout mapsFrameLayoutBig = findViewById(R.id.mapsFrameLayoutBig);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
-        builder.setMessage(R.string.app_name)
+        builder.setTitle(marker.getTitle())
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
@@ -186,10 +186,9 @@ public class MapsActivity extends FragmentActivity implements
         final float defaultMapZoom = 18f;
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 marker.getPosition(), defaultMapZoom));
-        TextView buildingName = dialog.findViewById(R.id.buildingName);
         RatingBar waterRatingView = dialog.findViewById(R.id.waterRatingView);
         //waterRatingView.setRating();
-        buildingName.setText(marker.getTitle());
+
         return true;
     }
 
