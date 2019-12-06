@@ -119,4 +119,23 @@ class BuildingLatLng {
             }
         };
     }
+    public static Map<String, Double> getDisplayNamesAndRatings() {
+        return new HashMap<String, Double>() {
+            {
+                put("Altgeld", 0.0);
+                put("Architecture Building", 0.0);
+                put("Armory", 0.0);
+                put("Beckman Institute", 0.0);
+                put("Business Instructional Facility",0.0);
+                put("Ceramics Building",0.0);
+                put("Civil Engineering Lab",0.0);
+                put("Coordinated Science Lab",0.0);
+                put("David Kinley Hall",0.0);
+                put("Digital Computing Lab",0.0);
+                put("Electrical and Computer Engineering Building", 0.0);
+                put("Engineering Hall", 0.0);
+            }
+
+        };
+    }
 }

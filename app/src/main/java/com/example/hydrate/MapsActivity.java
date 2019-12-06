@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toast;
 
@@ -76,6 +77,12 @@ public class MapsActivity extends FragmentActivity implements
     /** Map of all Markers with their Building Names. */
     private Map<String, Marker> BUILDING_MARKERS;
 
+    /** Key of the closest building to the user. */
+    private String minKey;
+
+    /** TextView that holds building name for Alert Dialogs. */
+    private TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +133,7 @@ public class MapsActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         ImageButton settings = findViewById(R.id.settings);
         Button hydrate = findViewById(R.id.hydrate);
+        textView = findViewById(R.id.textView);
         map = googleMap;
 
         // Initial Markers.
@@ -157,6 +165,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
+        textView.setText(test);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
@@ -196,7 +205,7 @@ public class MapsActivity extends FragmentActivity implements
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             double minDistance = 10000;
-                            String minKey = "";
+                            minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
                             for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
