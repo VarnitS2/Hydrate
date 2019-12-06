@@ -18,8 +18,10 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.health.SystemHealthManager;
+import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.Toast;
 
@@ -156,6 +158,8 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public boolean onMarkerClick(final Marker marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        builder.setView(inflater.inflate(R.layout.alert_layout, null));
         builder.setMessage(R.string.app_name)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
