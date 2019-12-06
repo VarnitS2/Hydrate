@@ -16,6 +16,7 @@ import android.location.Location;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.Rating;
 import android.os.Bundle;
 import android.os.health.SystemHealthManager;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toast;
@@ -184,9 +186,8 @@ public class MapsActivity extends FragmentActivity implements
         final float defaultMapZoom = 18f;
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 marker.getPosition(), defaultMapZoom));
-
-        TextView buildingName = dialog.findViewById(R.id.buildingName);
-        buildingName.setText(marker.getTitle());
+        RatingBar waterRatingView = dialog.findViewById(R.id.waterRatingView);
+        //waterRatingView.setRating();
 
         return true;
     }
