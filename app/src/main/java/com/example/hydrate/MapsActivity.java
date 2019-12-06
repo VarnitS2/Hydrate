@@ -1,19 +1,78 @@
 package com.example.hydrate;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.health.SystemHealthManager;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
+import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import com.google.maps.android.SphericalUtil;
 
-    private GoogleMap mMap;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.util.Log;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressWarnings("SpellCheckingInspection")
+public class MapsActivity extends FragmentActivity implements
+        GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMyLocationClickListener,
+        OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener {
+
+    /** The GoogleMap to work with. */
+    private GoogleMap map;
+
+    /** The Request Constant (can be any number). */
+    private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
+
+    /** Google Play Location services client. */
+    private FusedLocationProviderClient fusedLocationClient;
+
+    /** The Map of all building LatLng objects. */
+    private Map<String, LatLng> BUILDING_LATLNGS;
+
+    /** The List of all building names. */
+    private ArrayList<String> BUILDING_NAMES;
+
+    /** Map of all Markers with their Building Names. */
+    private Map<String, Marker> BUILDING_MARKERS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +82,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-    }
 
+        BUILDING_LATLNGS = BuildingLatLng.getNameMap();
+        BUILDING_NAMES = new ArrayList<>();
+        BUILDING_MARKERS = new HashMap<>();
+
+        // Initializing google play location services client.
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Getting last known user location to center the map on.
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Centering map on the user.
+                            final float defaultMapZoom = 17f;
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(location.getLatitude(), location.getLongitude()), defaultMapZoom));
+                        }
+                    }
+                });
+
+        // Adding building names to an ArrayList.
+        for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
+            BUILDING_NAMES.add(entry.getKey());
+        }
+    }
 
     /**
      * Manipulates the map once available.
@@ -37,11 +122,158 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        ImageButton settings = findViewById(R.id.settings);
+        Button hydrate = findViewById(R.id.hydrate);
+        map = googleMap;
 
-        // Marker at Illini Union.
-        LatLng champaign = new LatLng(40.1093, -88.2272);
-        mMap.addMarker(new MarkerOptions().position(champaign).title("Marker in Champaign"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(champaign));
+        // Initial Markers.
+        for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
+            setMarker(entry.getKey(), entry.getValue());
+        }
+
+        // Getting location permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            map.setMyLocationEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+
+        map.setOnMyLocationButtonClickListener(this);
+        map.setOnMyLocationClickListener(this);
+
+        // Handler for the settings button.
+        settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
+
+        // Handler for the hydrate button.
+        hydrate.setOnClickListener(unused -> hydrateClickHandler());
+
+        map.setOnMarkerClickListener(this);
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.app_name)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.i("AD_BUTTON_PRESS", "Yes pressed");
+                    }
+                })
+                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.i("AD_BUTTON_PRESS", "Close pressed");
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        marker.showInfoWindow();
+        final float defaultMapZoom = 18f;
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                marker.getPosition(), defaultMapZoom));
+
+        return true;
+    }
+
+    /**
+     * Callback for Hydrate button.
+     */
+    public void hydrateClickHandler() {
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            double minDistance = 10000;
+                            String minKey = "";
+                            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+                            for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
+                                double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue());
+                                if (distance < minDistance) {
+                                    minDistance = distance;
+                                    minKey = entry.getKey();
+                                }
+                            }
+
+                            // Centering map on the closest water fountain.
+                            final float defaultMapZoom = 18f;
+                            map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                    BUILDING_LATLNGS.get(minKey), defaultMapZoom));
+
+                            BUILDING_MARKERS.get(minKey).showInfoWindow();
+                            onMarkerClick(BUILDING_MARKERS.get(minKey));
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Sets a marker at the specified location with the specified name.
+     */
+    public void setMarker(String name, LatLng location) {
+        Marker marker = map.addMarker(new MarkerOptions().position(location).title(name).snippet("Yo").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+        map.moveCamera(CameraUpdateFactory.newLatLng(location));
+
+        BUILDING_MARKERS.put(name, marker);
+    }
+
+    /**
+     * Asks the user for access to their location
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted.
+                    return;
+                } else {
+                    // Permission denied; try again.
+                    Toast.makeText(this, "Please let us have your location", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                }
+                return;
+            }
+        }
+    }
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+        Toast.makeText(this, "Current location", Toast.LENGTH_LONG).show();
+    }
+    @Override
+    public boolean onMyLocationButtonClick() {
+        Toast.makeText(this, "Current Location", Toast.LENGTH_SHORT).show();
+        // Return false so that we don't consume the event and the default behavior still occurs
+        // (the camera animates to the user's current position).
+
+        // Getting last known user location to center the map on.
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Centering map on the user.
+                            final float defaultMapZoom = 17f;
+                            map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(location.getLatitude(), location.getLongitude()), defaultMapZoom));
+                        }
+                    }
+                });
+
+        return false;
     }
 }
