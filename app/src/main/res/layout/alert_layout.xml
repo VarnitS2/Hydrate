@@ -6,27 +6,18 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="168dp"
-        android:layout_height="167dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginLeft="80dp"
-        android:src="@drawable/building"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <RatingBar
         android:id="@+id/waterRatingView"
         style="@style/Widget.AppCompat.RatingBar.Indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="80dp"
-        android:layout_marginLeft="120dp"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="13dp"
         android:isIndicator="true"
         android:numStars="5"
         android:rating="4.5"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

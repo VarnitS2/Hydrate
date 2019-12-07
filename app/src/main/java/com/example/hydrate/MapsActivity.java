@@ -166,7 +166,7 @@ public class MapsActivity extends FragmentActivity implements
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
         builder.setTitle(marker.getTitle())
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.more_info, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Log.i("AD_BUTTON_PRESS", "Yes pressed");
@@ -287,4 +287,5 @@ public class MapsActivity extends FragmentActivity implements
 
         return false;
     }
+
 }
