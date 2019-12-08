@@ -170,16 +170,16 @@ public class MapsActivity extends FragmentActivity implements
         Context deez = this;
         String markerTitle = marker.getTitle();
         builder.setTitle(markerTitle)
-                .setPositiveButton(R.string.more_info, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        //Toast.makeText(deez, markerTitle, Toast.LENGTH_LONG).show();
-                        Log.i("AD_BUTTON_PRESS", "Yes pressed");
-                        Intent intent = new Intent(deez, MoreInfoActivity.class);
-                        intent.putExtra("markerTitle", markerTitle);
-                        startActivity(intent);
-                    }
-                })
+//                .setPositiveButton(R.string.more_info, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        //Toast.makeText(deez, markerTitle, Toast.LENGTH_LONG).show();
+//                        Log.i("AD_BUTTON_PRESS", "Yes pressed");
+//                        Intent intent = new Intent(deez, MoreInfoActivity.class);
+//                        intent.putExtra("markerTitle", markerTitle);
+//                        startActivity(intent);
+//                    }
+//                })
                 .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
@@ -294,11 +294,6 @@ public class MapsActivity extends FragmentActivity implements
                 });
 
         return false;
-    }
-    public void moreInfoClickHandler(Marker marker) {
-        Intent intent = new Intent(this, MoreInfoActivity.class);
-
-
     }
 
 }
