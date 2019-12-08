@@ -19,6 +19,7 @@ import android.location.Location;
 import android.media.Rating;
 import android.os.Bundle;
 import android.os.health.SystemHealthManager;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -115,6 +116,13 @@ public class MapsActivity extends FragmentActivity implements
         for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
             BUILDING_NAMES.add(entry.getKey());
         }
+
+        try {
+            List data = DataParser.getRatingData(this.getAssets());
+            // System.out.println(data);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -165,14 +173,16 @@ public class MapsActivity extends FragmentActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
-        builder.setTitle(marker.getTitle())
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Log.i("AD_BUTTON_PRESS", "Yes pressed");
-                    }
-                })
-                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+
+//         TODO: Add new activity for more info.
+//        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        Log.i("AD_BUTTON_PRESS", "Yes pressed");
+//                    }
+//                })
+
+        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Log.i("AD_BUTTON_PRESS", "Close pressed");
@@ -186,8 +196,10 @@ public class MapsActivity extends FragmentActivity implements
         final float defaultMapZoom = 18f;
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 marker.getPosition(), defaultMapZoom));
+
         RatingBar waterRatingView = dialog.findViewById(R.id.waterRatingView);
-        //waterRatingView.setRating();
+        TextView title = dialog.findViewById(R.id.title);
+        title.setText(marker.getTitle());
 
         return true;
     }

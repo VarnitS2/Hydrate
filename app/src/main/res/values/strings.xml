@@ -20,4 +20,5 @@
     <!-- For Alert Dialogs -->
     <string name="yes">Yes</string>
     <string name="close">Close</string>
+    <string name="def">Default</string>
 </resources>
