@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -130,6 +131,7 @@ public class MapsActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         ImageButton settings = findViewById(R.id.settings);
         Button hydrate = findViewById(R.id.hydrate);
+        TextView buildingNameMoreInfo = findViewById(R.id.buildingNameMoreInfo);
         map = googleMap;
 
         // Initial Markers.
@@ -165,11 +167,17 @@ public class MapsActivity extends FragmentActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
-        builder.setTitle(marker.getTitle())
+        Context deez = this;
+        String markerTitle = marker.getTitle();
+        builder.setTitle(markerTitle)
                 .setPositiveButton(R.string.more_info, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
+                        //Toast.makeText(deez, markerTitle, Toast.LENGTH_LONG).show();
                         Log.i("AD_BUTTON_PRESS", "Yes pressed");
+                        Intent intent = new Intent(deez, MoreInfoActivity.class);
+                        intent.putExtra("markerTitle", markerTitle);
+                        startActivity(intent);
                     }
                 })
                 .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
@@ -286,6 +294,11 @@ public class MapsActivity extends FragmentActivity implements
                 });
 
         return false;
+    }
+    public void moreInfoClickHandler(Marker marker) {
+        Intent intent = new Intent(this, MoreInfoActivity.class);
+
+
     }
 
 }
