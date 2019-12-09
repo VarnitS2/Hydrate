@@ -3,31 +3,18 @@ package com.example.hydrate;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.media.Rating;
 import android.os.Bundle;
-import android.os.health.SystemHealthManager;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -45,15 +32,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.SphericalUtil;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
 import android.util.Log;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -218,6 +201,23 @@ public class MapsActivity extends FragmentActivity implements
 
         RatingBar waterRatingView = dialog.findViewById(R.id.waterRatingView);
         waterRatingView.setRating((float) ((double) BUILDING_RATINGS.get(marker.getTitle())));
+
+        TextView distance = dialog.findViewById(R.id.distance);
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            LatLng markerLoc = marker.getPosition();
+                            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                            double calculatedDistance = SphericalUtil.computeDistanceBetween(currentLocation, markerLoc);
+
+                            distance.setText((int) calculatedDistance + " metres away.");
+                        }
+                    }
+                });
 
         return true;
     }
