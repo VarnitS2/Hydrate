@@ -41,7 +41,7 @@ public class SignUpActivity extends AppCompatActivity {
                         .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                Log.i("AD_BUTTON_PRESS", "Close pressed");
+                                Log.i("AD_BUTTON_PRESS", "Okay pressed");
                             }
                         });
 
@@ -54,7 +54,7 @@ public class SignUpActivity extends AppCompatActivity {
                         .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                Log.i("AD_BUTTON_PRESS", "Close pressed");
+                                Log.i("AD_BUTTON_PRESS", "Okay pressed");
                             }
                         });
 
@@ -67,7 +67,7 @@ public class SignUpActivity extends AppCompatActivity {
                         .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                Log.i("AD_BUTTON_PRESS", "Close pressed");
+                                Log.i("AD_BUTTON_PRESS", "Okay pressed");
                             }
                         });
 
