@@ -3,24 +3,18 @@ package com.example.hydrate;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.health.SystemHealthManager;
+import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
+import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -38,15 +32,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.SphericalUtil;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
 import android.util.Log;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -74,6 +64,12 @@ public class MapsActivity extends FragmentActivity implements
     /** Map of all Markers with their Building Names. */
     private Map<String, Marker> BUILDING_MARKERS;
 
+    /** Map of all buildings with their ratings. */
+    private Map<String, Double> BUILDING_RATINGS;
+
+    /** The default rating for unrated buildings. */
+    private double DEFAULT_RATING = 3.5;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +82,7 @@ public class MapsActivity extends FragmentActivity implements
         BUILDING_LATLNGS = BuildingLatLng.getNameMap();
         BUILDING_NAMES = new ArrayList<>();
         BUILDING_MARKERS = new HashMap<>();
+        BUILDING_RATINGS = new HashMap<>();
 
         // Initializing google play location services client.
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -108,6 +105,22 @@ public class MapsActivity extends FragmentActivity implements
         // Adding building names to an ArrayList.
         for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
             BUILDING_NAMES.add(entry.getKey());
+        }
+
+        for (int i = 0; i < BUILDING_NAMES.size(); i++) {
+            BUILDING_RATINGS.put(BUILDING_NAMES.get(i), DEFAULT_RATING);
+        }
+
+        Map<String, Double> ratedRatings = new HashMap<>();
+
+        try {
+            ratedRatings = DataParser.getRatings(this.getAssets());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        for (Map.Entry<String, Double> entry : ratedRatings.entrySet()) {
+            BUILDING_RATINGS.put(entry.getKey(), entry.getValue());
         }
     }
 
@@ -150,20 +163,25 @@ public class MapsActivity extends FragmentActivity implements
         // Handler for the hydrate button.
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
 
+        // OnClick Listener for markers.
         map.setOnMarkerClickListener(this);
     }
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.app_name)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        Log.i("AD_BUTTON_PRESS", "Yes pressed");
-                    }
-                })
-                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+        LayoutInflater inflater = this.getLayoutInflater();
+        builder.setView(inflater.inflate(R.layout.alert_layout, null));
+
+//         TODO: Add new activity for more info.
+//        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        Log.i("AD_BUTTON_PRESS", "Yes pressed");
+//                    }
+//                })
+
+        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Log.i("AD_BUTTON_PRESS", "Close pressed");
@@ -178,6 +196,29 @@ public class MapsActivity extends FragmentActivity implements
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 marker.getPosition(), defaultMapZoom));
 
+        TextView title = dialog.findViewById(R.id.title);
+        title.setText(marker.getTitle());
+
+        RatingBar waterRatingView = dialog.findViewById(R.id.waterRatingView);
+        waterRatingView.setRating((float) ((double) BUILDING_RATINGS.get(marker.getTitle())));
+
+        TextView distance = dialog.findViewById(R.id.distance);
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            LatLng markerLoc = marker.getPosition();
+                            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                            double calculatedDistance = SphericalUtil.computeDistanceBetween(currentLocation, markerLoc);
+
+                            distance.setText((int) calculatedDistance + " metres away.");
+                        }
+                    }
+                });
+
         return true;
     }
 
@@ -191,7 +232,7 @@ public class MapsActivity extends FragmentActivity implements
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            double minDistance = 10000;
+                            double minDistance = 999999999;
                             String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -219,7 +260,7 @@ public class MapsActivity extends FragmentActivity implements
      * Sets a marker at the specified location with the specified name.
      */
     public void setMarker(String name, LatLng location) {
-        Marker marker = map.addMarker(new MarkerOptions().position(location).title(name).snippet("Yo").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+        Marker marker = map.addMarker(new MarkerOptions().position(location).title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
         map.moveCamera(CameraUpdateFactory.newLatLng(location));
 
         BUILDING_MARKERS.put(name, marker);
