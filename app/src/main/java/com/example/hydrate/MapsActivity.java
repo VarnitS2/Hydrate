@@ -81,6 +81,12 @@ public class MapsActivity extends FragmentActivity implements
     /** Map of all Markers with their Building Names. */
     private Map<String, Marker> BUILDING_MARKERS;
 
+    /** Map of all buildings with their ratings. */
+    private Map<String, Double> BUILDING_RATINGS;
+
+    /** The default rating for unrated buildings. */
+    private double DEFAULT_RATING = 3.5;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +99,7 @@ public class MapsActivity extends FragmentActivity implements
         BUILDING_LATLNGS = BuildingLatLng.getNameMap();
         BUILDING_NAMES = new ArrayList<>();
         BUILDING_MARKERS = new HashMap<>();
+        BUILDING_RATINGS = new HashMap<>();
 
         // Initializing google play location services client.
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -117,11 +124,20 @@ public class MapsActivity extends FragmentActivity implements
             BUILDING_NAMES.add(entry.getKey());
         }
 
+        for (int i = 0; i < BUILDING_NAMES.size(); i++) {
+            BUILDING_RATINGS.put(BUILDING_NAMES.get(i), DEFAULT_RATING);
+        }
+
+        Map<String, Double> ratedRatings = new HashMap<>();
+
         try {
-            List data = DataParser.getRatingData(this.getAssets());
-            // System.out.println(data);
+            ratedRatings = DataParser.getRatings(this.getAssets());
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
+
+        for (Map.Entry<String, Double> entry : ratedRatings.entrySet()) {
+            BUILDING_RATINGS.put(entry.getKey(), entry.getValue());
         }
     }
 
@@ -197,9 +213,11 @@ public class MapsActivity extends FragmentActivity implements
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 marker.getPosition(), defaultMapZoom));
 
-        RatingBar waterRatingView = dialog.findViewById(R.id.waterRatingView);
         TextView title = dialog.findViewById(R.id.title);
         title.setText(marker.getTitle());
+
+        RatingBar waterRatingView = dialog.findViewById(R.id.waterRatingView);
+        waterRatingView.setRating((float) ((double) BUILDING_RATINGS.get(marker.getTitle())));
 
         return true;
     }
