@@ -21,6 +21,7 @@ import android.media.Rating;
 import android.os.Bundle;
 import android.os.health.SystemHealthManager;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -32,11 +33,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -81,6 +84,12 @@ public class MapsActivity extends FragmentActivity implements
     /** Map of all Markers with their Building Names. */
     private Map<String, Marker> BUILDING_MARKERS;
 
+    /** True when the settings button is pressed. */
+    private boolean settingsClickedFlag;
+
+    /** Camera position when the settings button is pressed. */
+    private CameraPosition cameraPositionBeforeSettingsPress;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +98,16 @@ public class MapsActivity extends FragmentActivity implements
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        ImageButton settings = findViewById(R.id.settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                settingsClickedFlag = true;
+                cameraPositionBeforeSettingsPress = map.getCameraPosition();
+                Toast.makeText(MapsActivity.this, "wus good bruh", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
+            }
+        });
 
         BUILDING_LATLNGS = BuildingLatLng.getNameMap();
         BUILDING_NAMES = new ArrayList<>();
@@ -106,8 +125,14 @@ public class MapsActivity extends FragmentActivity implements
                         if (location != null) {
                             // Centering map on the user.
                             final float defaultMapZoom = 17f;
-                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(location.getLatitude(), location.getLongitude()), defaultMapZoom));
+                            if (!settingsClickedFlag) {
+                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                        new LatLng(location.getLatitude(), location.getLongitude()), defaultMapZoom));
+                            } else {
+                                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositionBeforeSettingsPress));
+                                settingsClickedFlag = false;
+                            }
+
                         }
                     }
                 });
@@ -129,7 +154,6 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        ImageButton settings = findViewById(R.id.settings);
         Button hydrate = findViewById(R.id.hydrate);
         TextView buildingNameMoreInfo = findViewById(R.id.buildingNameMoreInfo);
         map = googleMap;
@@ -151,9 +175,6 @@ public class MapsActivity extends FragmentActivity implements
 
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
-
-        // Handler for the settings button.
-        settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
 
         // Handler for the hydrate button.
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
