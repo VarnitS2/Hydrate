@@ -2,10 +2,12 @@
     <string name="app_name">Hydrate</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_log_in">Log In</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
+    <string name="log_in">Log In</string>
 
     <!-- Messages Preferences -->
     <string name="signature_title">Your signature</string>
@@ -21,4 +23,7 @@
     <string name="yes">Yes</string>
     <string name="close">Close</string>
     <string name="def">Default</string>
+    <string name="email_def">Email</string>
+    <string name="password_def">Password</string>
+    <string name="sign_up">Sign Up</string>
 </resources>
