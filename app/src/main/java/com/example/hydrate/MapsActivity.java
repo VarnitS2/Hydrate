@@ -3,10 +3,6 @@ package com.example.hydrate;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -14,21 +10,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.media.Rating;
 import android.os.Bundle;
-import android.os.health.SystemHealthManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -48,12 +36,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.SphericalUtil;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
 import android.util.Log;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,11 +69,11 @@ public class MapsActivity extends FragmentActivity implements
     /** Map of all Markers with their Building Names. */
     private Map<String, Marker> BUILDING_MARKERS;
 
-    /** True when the settings button is pressed. */
-    private boolean settingsClickedFlag;
+    /** Map of all buildings with their ratings. */
+    private Map<String, Double> BUILDING_RATINGS;
 
-    /** Camera position when the settings button is pressed. */
-    private CameraPosition cameraPositionBeforeSettingsPress;
+    /** The default rating for unrated buildings. */
+    private double DEFAULT_RATING = 3.5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,19 +84,10 @@ public class MapsActivity extends FragmentActivity implements
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        ImageButton settings = findViewById(R.id.settings);
-        settings.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                settingsClickedFlag = true;
-                cameraPositionBeforeSettingsPress = map.getCameraPosition();
-                Toast.makeText(MapsActivity.this, "wus good bruh", Toast.LENGTH_LONG).show();
-                startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
-            }
-        });
-
         BUILDING_LATLNGS = BuildingLatLng.getNameMap();
         BUILDING_NAMES = new ArrayList<>();
         BUILDING_MARKERS = new HashMap<>();
+        BUILDING_RATINGS = new HashMap<>();
 
         // Initializing google play location services client.
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -125,14 +101,8 @@ public class MapsActivity extends FragmentActivity implements
                         if (location != null) {
                             // Centering map on the user.
                             final float defaultMapZoom = 17f;
-                            if (!settingsClickedFlag) {
-                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(location.getLatitude(), location.getLongitude()), defaultMapZoom));
-                            } else {
-                                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositionBeforeSettingsPress));
-                                settingsClickedFlag = false;
-                            }
-
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(location.getLatitude(), location.getLongitude()), defaultMapZoom));
                         }
                     }
                 });
@@ -140,6 +110,22 @@ public class MapsActivity extends FragmentActivity implements
         // Adding building names to an ArrayList.
         for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
             BUILDING_NAMES.add(entry.getKey());
+        }
+
+        for (int i = 0; i < BUILDING_NAMES.size(); i++) {
+            BUILDING_RATINGS.put(BUILDING_NAMES.get(i), DEFAULT_RATING);
+        }
+
+        Map<String, Double> ratedRatings = new HashMap<>();
+
+        try {
+            ratedRatings = DataParser.getRatings(this.getAssets());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        for (Map.Entry<String, Double> entry : ratedRatings.entrySet()) {
+            BUILDING_RATINGS.put(entry.getKey(), entry.getValue());
         }
     }
 
@@ -154,8 +140,8 @@ public class MapsActivity extends FragmentActivity implements
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        ImageButton settings = findViewById(R.id.settings);
         Button hydrate = findViewById(R.id.hydrate);
-        TextView buildingNameMoreInfo = findViewById(R.id.buildingNameMoreInfo);
         map = googleMap;
 
         // Initial Markers.
@@ -175,6 +161,9 @@ public class MapsActivity extends FragmentActivity implements
 
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
+
+        // Handler for the settings button.
+        settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
 
         // Handler for the hydrate button.
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
@@ -215,8 +204,29 @@ public class MapsActivity extends FragmentActivity implements
         final float defaultMapZoom = 18f;
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 marker.getPosition(), defaultMapZoom));
+
+        TextView title = dialog.findViewById(R.id.title);
+        title.setText(marker.getTitle());
+
         RatingBar waterRatingView = dialog.findViewById(R.id.waterRatingView);
-        //waterRatingView.setRating();
+        waterRatingView.setRating((float) ((double) BUILDING_RATINGS.get(marker.getTitle())));
+
+        TextView distance = dialog.findViewById(R.id.distance);
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            LatLng markerLoc = marker.getPosition();
+                            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                            double calculatedDistance = SphericalUtil.computeDistanceBetween(currentLocation, markerLoc);
+
+                            distance.setText((int) calculatedDistance + " metres away.");
+                        }
+                    }
+                });
 
         return true;
     }
@@ -225,13 +235,14 @@ public class MapsActivity extends FragmentActivity implements
      * Callback for Hydrate button.
      */
     public void hydrateClickHandler() {
+        Context deez2 = this;
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            double minDistance = 10000;
+                            double minDistance = 999999999;
                             String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -242,14 +253,34 @@ public class MapsActivity extends FragmentActivity implements
                                     minKey = entry.getKey();
                                 }
                             }
-
+                            double range = minDistance + 65;
+                            ArrayList<Marker> suggestedBuildings = new ArrayList<>();
+                            for (Map.Entry<String, Marker> entry : BUILDING_MARKERS.entrySet()) {
+                                double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue().getPosition());
+                                if (distance < range) {
+                                    suggestedBuildings.add(entry.getValue());
+                                }
+                            }
+                            double maximumBuildingFactor = 0;
+                            int i = 0;
+                            int maxIndex = 0;
+                            for (Marker possibleBuilding : suggestedBuildings) {
+                                double distance = SphericalUtil.computeDistanceBetween(currentLocation, possibleBuilding.getPosition());
+                                double buildingFactor =  .09 * distance * (BUILDING_RATINGS.get(possibleBuilding.getTitle()) / 100);
+                                if (buildingFactor > maximumBuildingFactor) {
+                                    maximumBuildingFactor = buildingFactor;
+                                    maxIndex = i;
+                                }
+                                i++;
+                            }
                             // Centering map on the closest water fountain.
                             final float defaultMapZoom = 18f;
                             map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                                     BUILDING_LATLNGS.get(minKey), defaultMapZoom));
 
                             BUILDING_MARKERS.get(minKey).showInfoWindow();
-                            onMarkerClick(BUILDING_MARKERS.get(minKey));
+                            Toast.makeText(deez2, maximumBuildingFactor + " ", Toast.LENGTH_LONG).show();
+                            onMarkerClick(BUILDING_MARKERS.get(suggestedBuildings.get(maxIndex).getTitle()));
                         }
                     }
                 });
@@ -316,5 +347,4 @@ public class MapsActivity extends FragmentActivity implements
 
         return false;
     }
-
 }
