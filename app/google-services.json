@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "569539721164",
+    "firebase_url": "https://western-notch-259519.firebaseio.com",
+    "project_id": "western-notch-259519",
+    "storage_bucket": "western-notch-259519.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:569539721164:android:0f55d84a4b907f46d80f69",
+        "android_client_info": {
+          "package_name": "com.example.hydrate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "569539721164-9t7t7or9aobdi42705onu6igum886782.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAP82L3tZi1MQcHVERkjt3_91eLv6egn_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "569539721164-9t7t7or9aobdi42705onu6igum886782.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

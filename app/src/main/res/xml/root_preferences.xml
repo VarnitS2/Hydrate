@@ -24,9 +24,19 @@
             android:defaultValue="0"
             android:entries="@array/priority_measurement_entries"
             android:entryValues="@array/priority_measurement_entries"
-            android:key="list_preference_1"
+            android:key="@string/priority_measurements"
             android:title="Priority Measurements" />
         //Change List options in array.xml file
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Account Settings">
+
+        <Preference android:title="Log In"
+            android:key="@string/log_in"/>
+
+        <Preference android:title="Log Out"
+            android:key="@string/log_out"/>
 
     </PreferenceCategory>
 

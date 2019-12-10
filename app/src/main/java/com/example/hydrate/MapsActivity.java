@@ -1,6 +1,7 @@
 package com.example.hydrate;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -13,11 +14,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.ListPreference;
-import android.preference.Preference;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +44,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +90,9 @@ public class MapsActivity extends FragmentActivity implements
 
     /** Value that multiplies the distance - Decrease to prioritize distance. */
     private double DISTANCE_MULTIPLIER = 1.25;
+
+    /** Value that multiplies the distance - Decrease to prioritize distance. */
+    private boolean isDistance = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +163,14 @@ public class MapsActivity extends FragmentActivity implements
         Button hydrate = findViewById(R.id.hydrate);
         map = googleMap;
 
+        CustomSettingsActivity customSettingsActivity = new CustomSettingsActivity();
+        customSettingsActivity.distance.setOnClickListener(unused -> {
+            isDistance = true;
+        });
+        customSettingsActivity.quality.setOnClickListener(unused -> {
+            isDistance = false;
+        });
+
         // Initial Markers.
         for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
             setMarker(entry.getKey(), entry.getValue());
@@ -175,7 +190,7 @@ public class MapsActivity extends FragmentActivity implements
         map.setOnMyLocationClickListener(this);
 
         // Handler for the settings button.
-        settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
+        settings.setOnClickListener(unused -> startActivity(new Intent(this, CustomSettingsActivity.class)));
 
         // Handler for the hydrate button.
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
@@ -224,7 +239,6 @@ public class MapsActivity extends FragmentActivity implements
         waterRatingView.setRating((float) ((double) BUILDING_RATINGS.get(marker.getTitle())));
 
         TextView distance = dialog.findViewById(R.id.distance);
-
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -257,9 +271,11 @@ public class MapsActivity extends FragmentActivity implements
                             double minDistance = 999999999;
                             String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+//                            ArrayList<Double> listOfDistances = new ArrayList<>();
 
                             for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
                                 double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue());
+//                                listOfDistances.add(distance);
                                 if (distance < minDistance) {
                                     minDistance = distance;
                                     minKey = entry.getKey();
@@ -292,7 +308,11 @@ public class MapsActivity extends FragmentActivity implements
 
                             BUILDING_MARKERS.get(minKey).showInfoWindow();
                             Toast.makeText(deez2, maximumBuildingFactor + " ", Toast.LENGTH_LONG).show();
-                            onMarkerClick(BUILDING_MARKERS.get(suggestedBuildings.get(maxIndex).getTitle()));
+                            if (isDistance) {
+                                onMarkerClick(BUILDING_MARKERS.get(minKey));
+                            } else {
+                                onMarkerClick(BUILDING_MARKERS.get(suggestedBuildings.get(maxIndex).getTitle()));
+                            }
                         }
                     }
                 });
@@ -359,7 +379,4 @@ public class MapsActivity extends FragmentActivity implements
 
         return false;
     }
-
-
-
 }

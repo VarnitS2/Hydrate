@@ -18,9 +18,19 @@
         <activity android:name=".MoreInfoActivity"
             android:parentActivityName=".MapsActivity"></activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".CustomSettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MapsActivity" />
+        <activity
+            android:name=".SignUpActivity"
+            android:label="@string/title_activity_sign_up"
+            android:parentActivityName=".LogInActivity" />
+        <activity
+            android:name=".LogInActivity"
+            android:label="@string/title_activity_log_in"
+            android:parentActivityName=".CustomSettingsActivity" />
+        <activity
+            android:name=".SettingsActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
