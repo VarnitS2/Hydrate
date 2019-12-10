@@ -8,9 +8,12 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -74,6 +77,15 @@ public class MapsActivity extends FragmentActivity implements
 
     /** The default rating for unrated buildings. */
     private double DEFAULT_RATING = 3.5;
+
+    /** Value added to minDistance to find the range. */
+    private double RANGE_MODIFIER = 65;
+
+    /** Value that divides the rating - Decrease to prioritize rating. */
+    private double RATING_MULTIPLIER = 0;
+
+    /** Value that multiplies the distance - Decrease to prioritize distance. */
+    private double DISTANCE_MULTIPLIER = 1.25;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,7 +265,7 @@ public class MapsActivity extends FragmentActivity implements
                                     minKey = entry.getKey();
                                 }
                             }
-                            double range = minDistance + 65;
+                            double range = minDistance + RANGE_MODIFIER;
                             ArrayList<Marker> suggestedBuildings = new ArrayList<>();
                             for (Map.Entry<String, Marker> entry : BUILDING_MARKERS.entrySet()) {
                                 double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue().getPosition());
@@ -266,7 +278,7 @@ public class MapsActivity extends FragmentActivity implements
                             int maxIndex = 0;
                             for (Marker possibleBuilding : suggestedBuildings) {
                                 double distance = SphericalUtil.computeDistanceBetween(currentLocation, possibleBuilding.getPosition());
-                                double buildingFactor =  .09 * distance * (BUILDING_RATINGS.get(possibleBuilding.getTitle()) / 100);
+                                double buildingFactor = (DISTANCE_MULTIPLIER * distance) + (BUILDING_RATINGS.get(possibleBuilding.getTitle()) * (10 + RATING_MULTIPLIER));
                                 if (buildingFactor > maximumBuildingFactor) {
                                     maximumBuildingFactor = buildingFactor;
                                     maxIndex = i;
@@ -347,4 +359,7 @@ public class MapsActivity extends FragmentActivity implements
 
         return false;
     }
+
+
+
 }

@@ -20,11 +20,12 @@
     <PreferenceCategory app:title="Hydrate Settings">
 
         <ListPreference
-            android:defaultValue="1"
+            android:id="@+id/priorityMeasurements"
+            android:defaultValue="0"
             android:entries="@array/priority_measurement_entries"
             android:entryValues="@array/priority_measurement_entries"
             android:key="list_preference_1"
-            android:title="Priority Measurments" />
+            android:title="Priority Measurements" />
         //Change List options in array.xml file
 
     </PreferenceCategory>
