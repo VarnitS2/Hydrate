@@ -164,14 +164,6 @@ public class MapsActivity extends FragmentActivity implements
         Button hydrate = findViewById(R.id.hydrate);
         map = googleMap;
 
-        CustomSettingsActivity customSettingsActivity = new CustomSettingsActivity();
-        customSettingsActivity.distance.setOnClickListener(unused -> {
-            isDistance = true;
-        });
-        customSettingsActivity.quality.setOnClickListener(unused -> {
-            isDistance = false;
-        });
-
         // Initial Markers.
         for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
             setMarker(entry.getKey(), entry.getValue());
@@ -309,9 +301,10 @@ public class MapsActivity extends FragmentActivity implements
 
                             BUILDING_MARKERS.get(minKey).showInfoWindow();
                             Toast.makeText(deez2, maximumBuildingFactor + " ", Toast.LENGTH_LONG).show();
-                            if (isDistance) {
+                            CustomSettingsActivity customSettingsActivity = new CustomSettingsActivity();
+                            if (customSettingsActivity.getCheckedButton() == 0 || customSettingsActivity.getCheckedButton() == -1) {
                                 onMarkerClick(BUILDING_MARKERS.get(minKey));
-                            } else {
+                            } else if(customSettingsActivity.getCheckedButton() == 1) {
                                 onMarkerClick(BUILDING_MARKERS.get(suggestedBuildings.get(maxIndex).getTitle()));
                             }
                         }

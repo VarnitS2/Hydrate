@@ -38,7 +38,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:text="@string/distance"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:checked="true" />
 
             <RadioButton
                 android:id="@+id/qualityButton"
