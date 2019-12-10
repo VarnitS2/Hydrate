@@ -43,12 +43,36 @@ public class SettingsActivity extends AppCompatActivity {
         /** All registered usernames. */
         private ArrayList<String> usernames;
 
+        /** Login flag check. */
+        private boolean loginFlag;
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            Preference button = findPreference(getString(R.string.log_in));
-            button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            Preference logInButton = findPreference(getString(R.string.log_in));
+            Preference logOutButton = findPreference(getString(R.string.log_out));
+
+            if (loginFlag) {
+                logInButton.setVisible(false);
+                logOutButton.setVisible(true);
+            } else {
+                logInButton.setVisible(true);
+                logOutButton.setVisible(false);
+            }
+
+            logOutButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Toast.makeText(getContext(), "Successfully logged out", Toast.LENGTH_LONG).show();
+                    loginFlag = false;
+                    logOutButton.setVisible(false);
+                    logInButton.setVisible(true);
+                    return true;
+                }
+            });
+
+            logInButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     Intent intent = new Intent(getContext(), LogInActivity.class);
@@ -56,6 +80,9 @@ public class SettingsActivity extends AppCompatActivity {
                     intent.putExtra("passwords", passwords);
                     intent.putExtra("usernames", usernames);
                     startActivityForResult(intent, 4444);
+
+                    logInButton.setVisible(false);
+                    logOutButton.setVisible(true);
                     return true;
                 }
             });
@@ -71,6 +98,7 @@ public class SettingsActivity extends AppCompatActivity {
                     emails = data.getStringArrayListExtra("emails");
                     passwords = data.getStringArrayListExtra("passwords");
                     usernames = data.getStringArrayListExtra("usernames");
+                    loginFlag = true;
 
                     Toast.makeText(getContext(), "Welcome " + username + "!", Toast.LENGTH_LONG).show();
                 }
