@@ -35,7 +35,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -203,7 +205,6 @@ public class MapsActivity extends FragmentActivity implements
         waterRatingView.setRating((float) ((double) BUILDING_RATINGS.get(marker.getTitle())));
 
         TextView distance = dialog.findViewById(R.id.distance);
-
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -235,14 +236,18 @@ public class MapsActivity extends FragmentActivity implements
                             double minDistance = 999999999;
                             String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+//                            ArrayList<Double> listOfDistances = new ArrayList<>();
 
                             for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
                                 double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue());
+//                                listOfDistances.add(distance);
                                 if (distance < minDistance) {
                                     minDistance = distance;
                                     minKey = entry.getKey();
                                 }
                             }
+
+//                            Collections.sort(listOfDistances);
 
                             // Centering map on the closest water fountain.
                             final float defaultMapZoom = 18f;
