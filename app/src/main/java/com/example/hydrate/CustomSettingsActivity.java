@@ -61,6 +61,12 @@ public class CustomSettingsActivity extends AppCompatActivity {
         //distance ;
         //quality = preferencesList.findViewById(R.id.qualityButton);
 
+        username = LogInDataHolder.USERNAME;
+        emails = LogInDataHolder.EMAILS;
+        passwords = LogInDataHolder.PASSWORDS;
+        usernames = LogInDataHolder.USERNAMES;
+        loginFlag = LogInDataHolder.LOGINFLAG;
+
         if (loginFlag) {
             logIn.setVisibility(View.GONE);
             logOut.setVisibility(View.VISIBLE);
@@ -74,7 +80,7 @@ public class CustomSettingsActivity extends AppCompatActivity {
         });
 
         logOut.setOnClickListener(unused -> {
-            Toast.makeText(this, "Successfully logged out", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Successfully logged out of " + username, Toast.LENGTH_LONG).show();
             loginFlag = false;
             logOut.setVisibility(View.GONE);
             logIn.setVisibility(View.VISIBLE);
@@ -105,6 +111,12 @@ public class CustomSettingsActivity extends AppCompatActivity {
                 loginFlag = true;
 
                 Toast.makeText(this, "Welcome " + username + "!", Toast.LENGTH_LONG).show();
+
+                LogInDataHolder.USERNAME = username;
+                LogInDataHolder.EMAILS = emails;
+                LogInDataHolder.PASSWORDS = passwords;
+                LogInDataHolder.USERNAMES = usernames;
+                LogInDataHolder.LOGINFLAG = loginFlag;
             }
         }
     }
