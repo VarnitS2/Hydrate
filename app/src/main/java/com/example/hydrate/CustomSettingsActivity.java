@@ -127,10 +127,9 @@ public class CustomSettingsActivity extends AppCompatActivity {
     }
 
     public int getCheckedButton() {
-        int checkedButton = preferencesList.getCheckedRadioButtonId();
-        if (checkedButton == R.id.distanceButton) {
+        if (LogInDataHolder.buttonID == R.id.distanceButton) {
             return 0;
-        } else if (checkedButton == R.id.qualityButton){
+        } else if (LogInDataHolder.buttonID == R.id.qualityButton){
             return 1;
         } else {
             return -1;
