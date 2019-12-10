@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -52,6 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             Preference logInButton = findPreference(getString(R.string.log_in));
             Preference logOutButton = findPreference(getString(R.string.log_out));
+            ListPreference priorityMeasurements = findPreference(getString(R.string.priority_measurements));
 
             if (loginFlag) {
                 logInButton.setVisible(false);

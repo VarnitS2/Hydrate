@@ -1,29 +1,39 @@
 package com.example.hydrate;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -39,6 +49,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -71,6 +82,18 @@ public class MapsActivity extends FragmentActivity implements
 
     /** The default rating for unrated buildings. */
     private double DEFAULT_RATING = 3.5;
+
+    /** Value added to minDistance to find the range. */
+    private double RANGE_MODIFIER = 65;
+
+    /** Value that divides the rating - Decrease to prioritize rating. */
+    private double RATING_MULTIPLIER = 0;
+
+    /** Value that multiplies the distance - Decrease to prioritize distance. */
+    private double DISTANCE_MULTIPLIER = 1;
+
+    /** Value that multiplies the distance - Decrease to prioritize distance. */
+    private boolean isDistance = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +183,7 @@ public class MapsActivity extends FragmentActivity implements
         map.setOnMyLocationClickListener(this);
 
         // Handler for the settings button.
-        settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
+        settings.setOnClickListener(unused -> startActivity(new Intent(this, CustomSettingsActivity.class)));
 
         // Handler for the hydrate button.
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
@@ -175,11 +198,15 @@ public class MapsActivity extends FragmentActivity implements
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
 
-//         TODO: Add new activity for more info.
-//        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+        // TODO: create more info logic
+//                .setPositiveButton(R.string.more_info, new DialogInterface.OnClickListener() {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int id) {
+//                        //Toast.makeText(deez, markerTitle, Toast.LENGTH_LONG).show();
 //                        Log.i("AD_BUTTON_PRESS", "Yes pressed");
+//                        Intent intent = new Intent(deez, MoreInfoActivity.class);
+//                        intent.putExtra("markerTitle", markerTitle);
+//                        startActivity(intent);
 //                    }
 //                })
 
@@ -227,6 +254,7 @@ public class MapsActivity extends FragmentActivity implements
      * Callback for Hydrate button.
      */
     public void hydrateClickHandler() {
+        Context deez2 = this;
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -236,18 +264,34 @@ public class MapsActivity extends FragmentActivity implements
                             double minDistance = 999999999;
                             String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-//                            ArrayList<Double> listOfDistances = new ArrayList<>();
 
                             for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
                                 double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue());
-//                                listOfDistances.add(distance);
                                 if (distance < minDistance) {
                                     minDistance = distance;
                                     minKey = entry.getKey();
                                 }
                             }
-
-//                            Collections.sort(listOfDistances);
+                            double range = minDistance + RANGE_MODIFIER;
+                            ArrayList<Marker> suggestedBuildings = new ArrayList<>();
+                            for (Map.Entry<String, Marker> entry : BUILDING_MARKERS.entrySet()) {
+                                double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue().getPosition());
+                                if (distance < range) {
+                                    suggestedBuildings.add(entry.getValue());
+                                }
+                            }
+                            double maximumBuildingFactor = 0;
+                            int i = 0;
+                            int maxIndex = 0;
+                            for (Marker possibleBuilding : suggestedBuildings) {
+                                double distance = SphericalUtil.computeDistanceBetween(currentLocation, possibleBuilding.getPosition());
+                                double buildingFactor = (DISTANCE_MULTIPLIER * distance) + (BUILDING_RATINGS.get(possibleBuilding.getTitle()) * (10 + RATING_MULTIPLIER));
+                                if (buildingFactor > maximumBuildingFactor) {
+                                    maximumBuildingFactor = buildingFactor;
+                                    maxIndex = i;
+                                }
+                                i++;
+                            }
 
                             // Centering map on the closest water fountain.
                             final float defaultMapZoom = 18f;
@@ -255,7 +299,13 @@ public class MapsActivity extends FragmentActivity implements
                                     BUILDING_LATLNGS.get(minKey), defaultMapZoom));
 
                             BUILDING_MARKERS.get(minKey).showInfoWindow();
-                            onMarkerClick(BUILDING_MARKERS.get(minKey));
+
+                            CustomSettingsActivity customSettingsActivity = new CustomSettingsActivity();
+                            if (customSettingsActivity.getCheckedButton() == 0 || customSettingsActivity.getCheckedButton() == -1) {
+                                onMarkerClick(BUILDING_MARKERS.get(minKey));
+                            } else if(customSettingsActivity.getCheckedButton() == 1) {
+                                onMarkerClick(BUILDING_MARKERS.get(suggestedBuildings.get(maxIndex).getTitle()));
+                            }
                         }
                     }
                 });
