@@ -90,7 +90,7 @@ public class MapsActivity extends FragmentActivity implements
     private double RATING_MULTIPLIER = 0;
 
     /** Value that multiplies the distance - Decrease to prioritize distance. */
-    private double DISTANCE_MULTIPLIER = 1.25;
+    private double DISTANCE_MULTIPLIER = 1;
 
     /** Value that multiplies the distance - Decrease to prioritize distance. */
     private boolean isDistance = true;
@@ -199,7 +199,7 @@ public class MapsActivity extends FragmentActivity implements
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
         Context deez = this;
         String markerTitle = marker.getTitle();
-        builder.setTitle(markerTitle)
+        builder
 //                .setPositiveButton(R.string.more_info, new DialogInterface.OnClickListener() {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int id) {
