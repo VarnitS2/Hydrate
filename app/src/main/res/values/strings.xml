@@ -4,6 +4,8 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_log_in">Log In</string>
     <string name="title_activity_sign_up">Sign Up</string>
+    <string name="hydrate_settings">Hydrate Settings</string>
+    <string name="account_settings">Account Settings</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -30,4 +32,7 @@
     <string name="password_def">Password</string>
     <string name="sign_up">Sign Up</string>
     <string name="username">Username</string>
+    <string name="priority_measurements">Priority Measurements</string>
+    <string name="distance">Distance</string>
+    <string name="quality">Quality</string>
 </resources>

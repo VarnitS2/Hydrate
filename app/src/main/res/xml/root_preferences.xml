@@ -23,7 +23,7 @@
             android:defaultValue="1"
             android:entries="@array/priority_measurement_entries"
             android:entryValues="@array/priority_measurement_entries"
-            android:key="list_preference_1"
+            android:key="@string/priority_measurements"
             android:title="Priority Measurements" />
         //Change List options in array.xml file
 

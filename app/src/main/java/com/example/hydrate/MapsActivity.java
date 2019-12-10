@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -160,7 +161,7 @@ public class MapsActivity extends FragmentActivity implements
         map.setOnMyLocationClickListener(this);
 
         // Handler for the settings button.
-        settings.setOnClickListener(unused -> startActivity(new Intent(this, SettingsActivity.class)));
+        settings.setOnClickListener(unused -> startActivity(new Intent(this, CustomSettingsActivity.class)));
 
         // Handler for the hydrate button.
         hydrate.setOnClickListener(unused -> hydrateClickHandler());
@@ -256,6 +257,9 @@ public class MapsActivity extends FragmentActivity implements
 
                             BUILDING_MARKERS.get(minKey).showInfoWindow();
                             onMarkerClick(BUILDING_MARKERS.get(minKey));
+
+                            SettingsActivity settingsActivity = new SettingsActivity();
+
                         }
                     }
                 });
