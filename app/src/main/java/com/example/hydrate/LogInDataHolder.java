@@ -18,4 +18,7 @@ public class LogInDataHolder {
 
     /** Login flag check. */
     public static boolean LOGINFLAG;
+
+    /** Holder for checked button. */
+    public static int buttonID;
 }

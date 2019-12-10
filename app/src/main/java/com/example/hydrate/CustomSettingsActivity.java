@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -67,6 +68,12 @@ public class CustomSettingsActivity extends AppCompatActivity {
         usernames = LogInDataHolder.USERNAMES;
         loginFlag = LogInDataHolder.LOGINFLAG;
 
+        if (LogInDataHolder.buttonID == R.id.distanceButton) {
+            distance.setChecked(true);
+        } else if (LogInDataHolder.buttonID == R.id.qualityButton) {
+            quality.setChecked(true);
+        }
+
         if (loginFlag) {
             logIn.setVisibility(View.GONE);
             logOut.setVisibility(View.VISIBLE);
@@ -75,9 +82,11 @@ public class CustomSettingsActivity extends AppCompatActivity {
             logIn.setVisibility(View.VISIBLE);
         }
 
+        preferencesList.setOnCheckedChangeListener((group, checkedId) -> LogInDataHolder.buttonID = checkedId);
+
         logOut.setOnClickListener(unused -> {
             Toast.makeText(this, "Successfully logged out of " + username, Toast.LENGTH_LONG).show();
-            loginFlag = false;
+            LogInDataHolder.LOGINFLAG = false;
             logOut.setVisibility(View.GONE);
             logIn.setVisibility(View.VISIBLE);
         });
@@ -114,6 +123,17 @@ public class CustomSettingsActivity extends AppCompatActivity {
                 LogInDataHolder.USERNAMES = usernames;
                 LogInDataHolder.LOGINFLAG = loginFlag;
             }
+        }
+    }
+
+    public int getCheckedButton() {
+        int checkedButton = preferencesList.getCheckedRadioButtonId();
+        if (checkedButton == R.id.distanceButton) {
+            return 0;
+        } else if (checkedButton == R.id.qualityButton){
+            return 1;
+        } else {
+            return -1;
         }
     }
 }
