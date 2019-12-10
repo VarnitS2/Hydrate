@@ -197,9 +197,8 @@ public class MapsActivity extends FragmentActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.alert_layout, null));
-        Context deez = this;
-        String markerTitle = marker.getTitle();
-        builder
+
+        // TODO: create more info logic
 //                .setPositiveButton(R.string.more_info, new DialogInterface.OnClickListener() {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int id) {
@@ -210,7 +209,8 @@ public class MapsActivity extends FragmentActivity implements
 //                        startActivity(intent);
 //                    }
 //                })
-                .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
+
+        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         Log.i("AD_BUTTON_PRESS", "Close pressed");
@@ -264,11 +264,9 @@ public class MapsActivity extends FragmentActivity implements
                             double minDistance = 999999999;
                             String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-//                            ArrayList<Double> listOfDistances = new ArrayList<>();
 
                             for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
                                 double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue());
-//                                listOfDistances.add(distance);
                                 if (distance < minDistance) {
                                     minDistance = distance;
                                     minKey = entry.getKey();
@@ -294,13 +292,14 @@ public class MapsActivity extends FragmentActivity implements
                                 }
                                 i++;
                             }
+
                             // Centering map on the closest water fountain.
                             final float defaultMapZoom = 18f;
                             map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                                     BUILDING_LATLNGS.get(minKey), defaultMapZoom));
 
                             BUILDING_MARKERS.get(minKey).showInfoWindow();
-                            Toast.makeText(deez2, maximumBuildingFactor + " ", Toast.LENGTH_LONG).show();
+
                             CustomSettingsActivity customSettingsActivity = new CustomSettingsActivity();
                             if (customSettingsActivity.getCheckedButton() == 0 || customSettingsActivity.getCheckedButton() == -1) {
                                 onMarkerClick(BUILDING_MARKERS.get(minKey));
