@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -237,18 +238,14 @@ public class MapsActivity extends FragmentActivity implements
                             double minDistance = 999999999;
                             String minKey = "";
                             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-//                            ArrayList<Double> listOfDistances = new ArrayList<>();
 
                             for (Map.Entry<String, LatLng> entry : BUILDING_LATLNGS.entrySet()) {
                                 double distance = SphericalUtil.computeDistanceBetween(currentLocation, entry.getValue());
-//                                listOfDistances.add(distance);
                                 if (distance < minDistance) {
                                     minDistance = distance;
                                     minKey = entry.getKey();
                                 }
                             }
-
-//                            Collections.sort(listOfDistances);
 
                             // Centering map on the closest water fountain.
                             final float defaultMapZoom = 18f;
@@ -257,9 +254,6 @@ public class MapsActivity extends FragmentActivity implements
 
                             BUILDING_MARKERS.get(minKey).showInfoWindow();
                             onMarkerClick(BUILDING_MARKERS.get(minKey));
-
-                            SettingsActivity settingsActivity = new SettingsActivity();
-
                         }
                     }
                 });
